@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Order Form - AL MISK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* Print-specific styles for A4 layout */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm;
+            }
+            
+            body {
+                margin: 0;
+                padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .print-only {
+                display: block !important;
+            }
+            
+            #jobOrderPreview {
+                width: 100%;
+                height: auto;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+                transform: none;
+                page-break-after: avoid;
+            }
+            
+            #jobOrderPreview * {
+                page-break-inside: avoid;
+            }
+        }
+        
+        /* Black & White Print Mode */
+        @media print {
+            body.bw-print #jobOrderPreview {
+                filter: grayscale(100%);
+            }
+        }
+        
+        /* Yellow form background */
+        .form-bg {
+            background-color: #FFEB9C;
+        }
+        
+        /* Checkbox styling */
+        .custom-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #000;
+            cursor: pointer;
+        }
+        
+        /* Table borders */
+        .form-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        .form-table td,
+        .form-table th {
+            border: 1px solid #000;
+            padding: 2px 6px;
+            font-size: 9pt;
+        }
+        
+        /* File preview */
+        .file-preview {
+            max-width: 100%;
+            max-height: 80mm;
+            object-fit: contain;
+        }
+        
+        /* Responsive preview scaling */
+        @media screen and (max-width: 900px) {
+            #jobOrderPreview {
+                transform: scale(0.8);
+                transform-origin: top center;
+            }
+        }
+        
+        @media screen and (max-width: 600px) {
+            #jobOrderPreview {
+                transform: scale(0.6);
+                transform-origin: top center;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-yellow-600 to-amber-600 text-white p-6 rounded-lg shadow-lg mb-6 no-print">
+            <h1 class="text-3xl font-bold">AL MISK Job Order Form</h1>
+            <p class="text-yellow-100 mt-2">Complete Form Builder with Print & PDF Export</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- LEFT COLUMN: FORM INPUTS -->
+            <div class="space-y-4 no-print">
+                
+                <!-- Basic Information -->
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-semibold mb-3 text-gray-800 border-b pb-2">Basic Information</h2>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Date</label>
+                            <input type="date" id="orderDate" 
+                                   class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Invoice No.</label>
+                            <input type="text" id="invoiceNo" 
+                                   class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500"
+                                   placeholder="Auto-generated">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Contact Person</label>
+                            <input type="text" id="contactPerson" 
+                                   class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Tel/Mob</label>
+                            <input type="text" id="telMob" 
+                                   class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Company Name</label>
+                            <input type="text" id="companyName" 
+                                   class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
+                            <input type="text" id="quantity" 
+                                   class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500">
+                        </div>
+                        
+                        <div class="col-span-2">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Kind of Job</label>
+                            <input type="text" id="kindOfJob" 
+                                   class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Printing Options -->
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-semibold mb-3 text-gray-800 border-b pb-2">Printing & Finishing</h2>
+                    
+                    <div class="space-y-3">
+                        <!-- Printing Type -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">Printing Type:</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="offsetPrinting" class="custom-checkbox">
+                                    <span class="text-sm">Offset Printing</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="digitalPrinting" class="custom-checkbox">
+                                    <span class="text-sm">Digital Printing</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Lamination -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">Lamination:</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="glossy" class="custom-checkbox">
+                                    <span class="text-sm">Glossy</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="matt" class="custom-checkbox">
+                                    <span class="text-sm">Matt</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="softTouch" class="custom-checkbox">
+                                    <span class="text-sm">Soft Touch</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Foiling -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">Foiling:</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="goldFoil" class="custom-checkbox">
+                                    <span class="text-sm">Gold</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="silverFoil" class="custom-checkbox">
+                                    <span class="text-sm">Silver</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="roseGoldFoil" class="custom-checkbox">
+                                    <span class="text-sm">Rose Gold</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="blackFoil" class="custom-checkbox">
+                                    <span class="text-sm">Black</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Die Cutting -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">Die Cutting:</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="fullCut" class="custom-checkbox">
+                                    <span class="text-sm">Full Cut</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="halfCut" class="custom-checkbox">
+                                    <span class="text-sm">Half Cut</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="creasing" class="custom-checkbox">
+                                    <span class="text-sm">Creasing</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Embossing -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">Embossing & Effects:</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="embossing" class="custom-checkbox">
+                                    <span class="text-sm">Embossing</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="dEmbossing" class="custom-checkbox">
+                                    <span class="text-sm">D Embossing</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="spotUV" class="custom-checkbox">
+                                    <span class="text-sm">Spot UV</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Foam & Paper Type -->
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-semibold mb-3 text-gray-800 border-b pb-2">Materials</h2>
+                    
+                    <div class="space-y-3">
+                        <!-- Foam Type -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">Foam Type:</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="pvc" class="custom-checkbox">
+                                    <span class="text-sm">PVC</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="velvet" class="custom-checkbox">
+                                    <span class="text-sm">VELVET</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="pu" class="custom-checkbox">
+                                    <span class="text-sm">PU</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Paper Type -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">Paper Type:</label>
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <label class="flex items-center gap-2 cursor-pointer w-32">
+                                        <input type="checkbox" id="grayBoard" class="custom-checkbox">
+                                        <span class="text-sm">Gray Board</span>
+                                    </label>
+                                    <input type="text" id="grayBoardValue" 
+                                           class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
+                                           placeholder="Details">
+                                </div>
+                                
+                                <div class="flex items-center gap-2">
+                                    <label class="flex items-center gap-2 cursor-pointer w-32">
+                                        <input type="checkbox" id="foodBoard" class="custom-checkbox">
+                                        <span class="text-sm">Food Board</span>
+                                    </label>
+                                    <input type="text" id="foodBoardValue" 
+                                           class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
+                                           placeholder="Details">
+                                </div>
+                                
+                                <div class="flex items-center gap-2">
+                                    <label class="flex items-center gap-2 cursor-pointer w-32">
+                                        <input type="checkbox" id="artMatt" class="custom-checkbox">
+                                        <span class="text-sm">Art Matt</span>
+                                    </label>
+                                    <input type="text" id="artMattValue" 
+                                           class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
+                                           placeholder="Details">
+                                </div>
+                                
+                                <div class="flex items-center gap-2">
+                                    <label class="flex items-center gap-2 cursor-pointer w-32">
+                                        <input type="checkbox" id="sticker" class="custom-checkbox">
+                                        <span class="text-sm">Sticker</span>
+                                    </label>
+                                    <input type="text" id="stickerValue" 
+                                           class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
+                                           placeholder="Details">
+                                </div>
+                                
+                                <div class="flex items-center gap-2">
+                                    <label class="flex items-center gap-2 cursor-pointer w-32">
+                                        <input type="checkbox" id="specialPaper" class="custom-checkbox">
+                                        <span class="text-sm">Special Paper</span>
+                                    </label>
+                                    <input type="text" id="specialPaperValue" 
+                                           class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
+                                           placeholder="Details">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Section & File Upload -->
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-semibold mb-3 text-gray-800 border-b pb-2">Additional Information</h2>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Remarks</label>
+                            <textarea id="remarks" rows="3"
+                                      class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500"
+                                      placeholder="Additional notes..."></textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Manager (Production)</label>
+                                <input type="text" id="manager" 
+                                       class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Accountant</label>
+                                <input type="text" id="accountant" 
+                                       class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500">
+                            </div>
+                            
+                            <div class="col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Delivery Date</label>
+                                <input type="date" id="deliveryDate" 
+                                       class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Upload Files (Images/PDF)</label>
+                            <input type="file" id="fileUpload" accept="image/*,.pdf" multiple
+                                   class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500">
+                            <div id="filePreviewContainer" class="mt-2 space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h2 class="text-lg font-semibold mb-3 text-gray-800 border-b pb-2">Actions</h2>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="saveDraft()" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium">
+                            💾 Save Draft
+                        </button>
+                        <button onclick="loadDraft()" 
+                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium">
+                            📂 Load Draft
+                        </button>
+                        <button onclick="exportJSON()" 
+                                class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium">
+                            📥 Export JSON
+                        </button>
+                        <button onclick="importJSON()" 
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm font-medium">
+                            📤 Import JSON
+                        </button>
+                        <button onclick="generatePDF()" 
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium">
+                            📄 Generate PDF
+                        </button>
+                        <button onclick="clearForm()" 
+                                class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm font-medium">
+                            🗑️ Clear Form
+                        </button>
+                        <button onclick="printColor()" 
+                                class="col-span-2 px-4 py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-white rounded-lg hover:from-yellow-600 hover:to-amber-700 transition text-sm font-semibold">
+                            🖨️ Print (Color)
+                        </button>
+                        <button onclick="printBW()" 
+                                class="col-span-2 px-4 py-3 bg-gradient-to-r from-gray-600 to-gray-800 text-white rounded-lg hover:from-gray-700 hover:to-gray-900 transition text-sm font-semibold">
+                            🖨️ Print (Black & White)
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: LIVE PREVIEW -->
+            <div class="bg-gray-200 p-4 rounded-lg shadow">
+                <h2 class="text-lg font-semibold mb-3 text-gray-800 no-print">Live Preview</h2>
+                <div class="bg-white overflow-auto" style="max-height: 90vh;">
+                    <div id="jobOrderPreview" class="form-bg" style="width: 210mm; padding: 10mm; font-family: Arial, sans-serif;">
+                        <!-- Preview content will be generated here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Hidden file input for JSON import -->
+    <input type="file" id="jsonImportInput" accept=".json" style="display: none;">
+
+    <!-- Link to external JavaScript -->
+    <script src="joborder.js"></script>
+    
+</body>
+</html>
