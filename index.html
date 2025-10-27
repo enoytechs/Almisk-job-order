@@ -1,1177 +1,679 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>AL MISK Job Order Form - Enhanced</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AL MISK Job Order System — Tailwind Functional</title>
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- html2pdf -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-    <style>
-        /* A4 Page Setup */
-        @page { size: A4; margin: 10mm; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh; padding:20px; }
-        .a4-container { width:210mm; min-height:297mm; margin:0 auto; background:white; box-shadow:0 10px 40px rgba(0,0,0,0.2); border-radius:8px; overflow:hidden; }
-        .content-wrapper { border:3px solid #2563eb; margin:12mm; padding:8mm; min-height:calc(297mm - 24mm); position:relative; background:white; }
-        .header-section { background: linear-gradient(135deg,#3b82f6 0%,#2563eb 100%); margin:-8mm -8mm 6mm -8mm; padding:8mm; color:white; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-        @media print {
-            body { margin:0; padding:0; background:white; }
-            .a4-container { margin:0; box-shadow:none; border-radius:0; page-break-after:avoid; }
-            .content-wrapper { margin:10mm; page-break-inside:avoid; }
-            .no-print { display:none !important; }
-            select,input,textarea { border:1px solid #333 !important; background:white !important; color:black !important; }
-            .header-section { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-        }
-        body.grayscale-print * { filter: grayscale(1) !important; -webkit-filter: grayscale(1) !important; }
-        .form-label { font-size:7.5pt; font-weight:600; color:#1e40af; margin-bottom:2px; display:block; }
-        .form-input,.form-select { font-size:7.5pt; padding:3px 6px; border:1.5px solid #3b82f6; background:#eff6ff; border-radius:4px; width:100%; transition:all .2s; }
-        .form-input:focus,.form-select:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.1); background:white; }
-        .section-card { background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:6px; padding:6px; margin-bottom:6px; }
-        .section-title { font-size:8.5pt; font-weight:700; color:#1e40af; background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%); color:white; padding:4px 8px; border-radius:4px; margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
-        .company-info { font-size:7pt; line-height:1.4; }
-        textarea { resize:none; }
-        .file-preview-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(60mm,1fr)); gap:4px; margin-top:4px; }
-        .file-preview { max-width:100%; max-height:50mm; object-fit:contain; border:1px solid #cbd5e1; border-radius:4px; }
-        .saved-indicator { position:fixed; top:20px; right:20px; background:linear-gradient(135deg,#10b981 0%,#059669 100%); color:white; padding:10px 20px; border-radius:8px; display:none; z-index:1000; box-shadow:0 4px 12px rgba(16,185,129,0.4); font-weight:600; }
-        .saved-indicator.show { display:block; animation:slideIn .3s ease-out; }
-        @keyframes slideIn { from { transform:translateX(400px); opacity:0 } to { transform:translateX(0); opacity:1 } }
-        .control-button { background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%); color:white; padding:10px 16px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:12px; transition:all .2s; box-shadow:0 2px 8px rgba(37,99,235,0.3); }
-        .control-button:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(37,99,235,0.4); }
-        .logo-placeholder { width:60px; height:60px; background:white; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#3b82f6; font-weight:bold; font-size:10px; text-align:center; }
-        /* Small job-list styles */
-        .job-badge { font-size:10px; padding:6px 8px; border-radius:6px; display:inline-block; }
-        .pending-alert { background:#fef3c7; color:#92400e; padding:4px 8px; border-radius:6px; font-size:11px; }
-        .attachment-thumb { max-height:45mm; object-fit:contain; border-radius:4px; border:1px solid #e5e7eb; }
-        /* image grid for 1/2/3 preview inside printable area */
-        .img-grid-1 .img-col { width:100%; display:inline-block; vertical-align:top; padding:2px; box-sizing:border-box; }
-        .img-grid-2 .img-col { width:50%; display:inline-block; vertical-align:top; padding:2px; box-sizing:border-box; }
-        .img-grid-3 .img-col { width:33.3333%; display:inline-block; vertical-align:top; padding:2px; box-sizing:border-box; }
-        .attach-img { max-height:6cm; width:100%; object-fit:contain; display:block; }
-        .no-print-compact { display:flex; gap:8px; align-items:center; }
-    </style>
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- remixicon -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <!-- html2pdf (optional, still included if you want PDF export later) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body>
+<body class="bg-gradient-to-r from-indigo-100 to-purple-100 min-h-screen flex items-start py-8">
 
-<!-- Saved indicator -->
-<div id="savedIndicator" class="saved-indicator">✓ Saved</div>
+  <div class="w-full max-w-7xl mx-auto px-4">
+    <div class="flex flex-col md:flex-row gap-6">
 
-<!-- Control Panel (no-print) -->
-<div class="no-print fixed top-4 left-4 space-y-2 z-50" style="width:190px;">
-    <button id="btnConfirmAdd" class="control-button w-full">✅ Confirm & Add Job</button>
-    <button id="btnSaveDraft" class="control-button w-full" style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);">💾 Save Draft (Ctrl/Cmd+S)</button>
-    <button id="btnLoadDraft" class="control-button w-full" style="background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);">⏳ Load Draft</button>
-    <button id="btnExportAll" class="control-button w-full" style="background:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%);">📦 Export All JSON</button>
-    <button id="btnPrintColor" class="control-button w-full">🖨 Print Color (Ctrl/Cmd+P)</button>
-    <button id="btnPrintBW" class="control-button w-full" style="background:linear-gradient(135deg,#64748b 0%,#475569 100%);">🖨 Print B&W</button>
-    <button id="btnClearForm" class="control-button w-full" style="background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);">🧹 Clear Form</button>
+      <!-- LEFT: FORM -->
+      <div id="form-section" class="flex-1 bg-white shadow-xl rounded-2xl border border-blue-200 p-6">
+        <div class="flex items-start justify-between mb-4 border-b pb-4">
+          <div>
+            <h1 class="text-2xl font-bold text-blue-800">AL MISK FOR CARTON BXS CON S P LLC</h1>
+            <p class="text-sm text-gray-600 mt-1">
+              📞 06-7420777 | 📱 WhatsApp: 055-1440633<br>
+              📸 @almisk.boxes | ✉️ almiskboxes@gmail.com
+            </p>
+          </div>
+          <div class="bg-blue-700 text-white px-3 py-2 rounded text-sm font-semibold">AL MISK LOGO</div>
+        </div>
+
+        <h2 class="text-center text-lg font-semibold text-blue-700 mb-4">JOB ORDER FORM</h2>
+
+        <form id="jobForm" class="space-y-4" autocomplete="off">
+         
+         <!-- Combined Row: Order Info (Always in One Line) -->
+<div class="grid grid-cols-6 gap-3 whitespace-nowrap">
+  <div>
+    <label class="block text-sm font-semibold text-blue-800">Order Date *</label>
+    <input name="orderDate" id="orderDate" type="date" required class="mt-1 w-full border rounded px-3 py-2 focus:ring focus:ring-blue-200">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-blue-800">Invoice No</label>
+    <input name="invoiceNumber" id="invoiceNumber" type="text" readonly placeholder="Auto-assigned" class="mt-1 w-full border bg-gray-100 rounded px-3 py-2">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-blue-800">Contact Person *</label>
+    <input name="contactPerson" id="contactPerson" type="text" required class="mt-1 w-full border rounded px-3 py-2 focus:ring focus:ring-blue-200">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-blue-800">Tel / Mobile *</label>
+    <input name="telephone" id="telephone" type="text" required class="mt-1 w-full border rounded px-3 py-2 focus:ring focus:ring-blue-200">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-blue-800">Company Name</label>
+    <input name="companyName" id="companyName" type="text" class="mt-1 w-full border rounded px-3 py-2">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-blue-800">Quantity *</label>
+    <input name="quantity" id="quantity" type="number" min="1" required class="mt-1 w-full border rounded px-3 py-2">
+  </div>
 </div>
 
-<!-- Main layout: left form / right jobs list -->
-<div class="max-w-7xl mx-auto py-8 px-4 flex gap-6">
-    <!-- Left: Form + printable area -->
-    <div class="flex-1">
-        <div class="a4-container" id="formContainer">
-            <div class="content-wrapper" id="contentWrapper">
-                <!-- Header -->
-                <div class="header-section">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h1 class="text-xl font-bold mb-2">AL MISK FOR CARTON BXS CON S P LLC</h1>
-                            <div class="company-info space-y-1">
-                                <div>📞 Phone: 06-7420777</div>
-                                <div>📱 WhatsApp: 055-1440633</div>
-                                <div>📷 Instagram: @almisk.boxes</div>
-                                <div>📧 Email: almiskboxes@gmail.com</div>
-                            </div>
-                        </div>
-                        <div class="logo-placeholder">AL MISK<br>LOGO</div>
-                    </div>
-                    <div class="text-center mt-4 text-2xl font-bold tracking-wide">JOB ORDER FORM</div>
-                </div>
 
-                <!-- Basic Info -->
-                <div class="section-card mt-2">
-                    <div class="grid grid-cols-3 gap-2 text-xs">
-                        <div>
-                            <label class="form-label">Order Date <span class="text-red-600">*</span></label>
-                            <input type="date" id="orderDate" class="form-input" aria-required="true" />
-                            <p id="err-orderDate" class="text-red-600 text-xs hidden">Required</p>
-                        </div>
-                        <div>
-                            <label class="form-label">Invoice No</label>
-                            <input type="text" id="invoiceNo" class="form-input" readonly placeholder="Assigned on confirm" />
-                            <p class="text-xs text-gray-500">Invoice assigned when you click Confirm & Add Job</p>
-                        </div>
-                        <div>
-                            <label class="form-label">Contact Person <span class="text-red-600">*</span></label>
-                            <input type="text" id="contactPerson" class="form-input" aria-required="true" />
-                            <p id="err-contactPerson" class="text-red-600 text-xs hidden">Required</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 mt-2 text-xs">
-                        <div>
-                            <label class="form-label">Tel / Mob <span class="text-red-600">*</span></label>
-                            <input type="tel" id="telMob" class="form-input" aria-required="true" />
-                            <p id="err-telMob" class="text-red-600 text-xs hidden">Required</p>
-                        </div>
-                        <div>
-                            <label class="form-label">Company Name</label>
-                            <input type="text" id="companyName" class="form-input" />
-                        </div>
-                        <div>
-                            <label class="form-label">Quantity <span class="text-red-600">*</span></label>
-                            <input type="number" id="quantity" class="form-input" min="1" aria-required="true" />
-                            <p id="err-quantity" class="text-red-600 text-xs hidden">Required & ≥1</p>
-                        </div>
-                    </div>
-                    <div class="mt-2 text-xs">
-                        <label class="form-label">Kind of Job</label>
-                        <input type="text" id="kindOfJob" class="form-input" placeholder="Production / Sample / Prototype" />
-                    </div>
-                </div>
+          <div>
+            <label class="block text-sm font-semibold text-blue-800">Kind of Job</label>
+            <input name="kindOfJob" id="kindOfJob" type="text" placeholder="Production / Sample / Prototype" class="mt-1 w-full border rounded px-3 py-2">
+          </div>
 
-                <!-- Product selection (kept minimal but extendable) -->
-                <div class="section-title mt-2">Product Type & Model</div>
-                <div class="grid grid-cols-3 gap-2 text-xs mb-2">
-                    <div>
-                        <label class="form-label">Product Type <span class="text-red-600">*</span></label>
-                        <select id="productType" class="form-select" aria-required="true">
-                            <option value="">Select type...</option>
-                            <option>Box</option><option>Bag</option><option>Sleeve</option><option>Envelope</option>
-                        </select>
-                        <p id="err-productType" class="text-red-600 text-xs hidden">Required</p>
-                    </div>
-                    <div>
-                        <label class="form-label">Model / Variant <span class="text-red-600">*</span></label>
-                        <select id="model" class="form-select" aria-required="true"><option value="">Select type first</option></select>
-                        <p id="err-model" class="text-red-600 text-xs hidden">Required</p>
-                    </div>
-                    <div>
-                        <label class="form-label">Dimensions / Notes</label>
-                        <input type="text" id="dimensions" class="form-input" placeholder="e.g., 200×150×80 mm" />
-                    </div>
-                </div>
+          <!-- Product type & model -->
+          <div class="rounded-md bg-blue-50 p-3">
+            <div class="text-sm font-semibold text-blue-900 mb-2">PRODUCT TYPE & MODEL</div>
 
-                <!-- Production Specifications -->
-                <div class="section-title">Production Specifications</div>
-                <div class="grid grid-cols-4 gap-2 mb-2 text-xs">
-                    <div>
-                        <label class="form-label">Printing Type</label>
-                        <select id="printingType" class="form-select"><option value="">-- Select --</option><option value="offset">Offset</option><option value="digital">Digital</option></select>
-                    </div>
-                    <div>
-                        <label class="form-label">Lamination</label>
-                        <select id="lamination" class="form-select"><option value="">-- Select --</option><option>None</option><option>Glossy</option><option>Matt</option><option>Soft-touch</option></select>
-                    </div>
-                    <div>
-                        <label class="form-label">Foiling</label>
-                        <select id="foilingType" class="form-select"><option value="">-- Select --</option><option>None</option><option>Gold</option><option>Silver</option><option>Rose Gold</option></select>
-                    </div>
-                    <div>
-                        <label class="form-label">Die Cutting</label>
-                        <select id="dieCutting" class="form-select"><option value="">-- Select --</option><option>None</option><option>Full Cut</option><option>Half Cut</option></select>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-sm font-semibold text-blue-800">Product Type *</label>
+                <select name="productType" id="productType" required class="mt-1 w-full border rounded px-3 py-2">
+                  <option value="">Select Type</option>
+                  <option value="Box">Box</option>
+                  <option value="Bag">Bag</option>
+                  <option value="Sleeve">Sleeve</option>
+                  <option value="Envelope">Envelope</option>
+                </select>
+              </div>
 
-                    <div>
-                        <label class="form-label">Embossing / UV</label>
-                        <select id="embossingUV" class="form-select"><option value="">-- Select --</option><option>None</option><option>Embossing</option><option>Spot UV</option></select>
-                    </div>
-                    <div>
-                        <label class="form-label">Foam Type</label>
-                        <select id="foamType" class="form-select"><option value="">-- Select --</option><option>None</option><option>PVC</option><option>Velvet</option><option>PU</option></select>
-                    </div>
-                    <div>
-                        <label class="form-label">Paper Type</label>
-                        <select id="paperType" class="form-select" onchange="toggleSpecialPaper()"><option value="">-- Select --</option><option value="gray-board">Gray Board</option><option value="food-board">Food Board</option><option value="art-matt">Art Matt</option><option value="sticker">Sticker</option><option value="special">Special Paper</option></select>
-                    </div>
-                    <div id="specialPaperDiv" style="display:none;">
-                        <label class="form-label">Specify Paper</label>
-                        <input type="text" id="specialPaper" class="form-input" placeholder="Enter paper details" />
-                    </div>
-                </div>
+              <!-- Dynamic model container: will contain either select or input -->
+              <div id="modelContainer">
+                <label class="block text-sm font-semibold text-blue-800">Model / Variant *</label>
+                <!-- default: select -->
+                <select name="modelVariant" id="modelVariantSelect" required class="mt-1 w-full border rounded px-3 py-2">
+                  <option value="">Select Type first</option>
+                </select>
+              </div>
 
-                <!-- Remarks and managers -->
-                <div class="grid grid-cols-2 gap-2 mb-2">
-                    <div class="section-card text-xs">
-                        <label class="form-label">Remarks (max 500)</label>
-                        <textarea id="remarks" class="form-input" rows="4" maxlength="500"></textarea>
-                        <div class="text-right text-xs text-gray-500 mt-1"><span id="charCount">0</span>/500</div>
-                    </div>
-                    <div class="space-y-2 text-xs">
-                        <div><label class="form-label">Manager (Production)</label><input type="text" id="manager" class="form-input" /></div>
-                        <div><label class="form-label">Accountant</label><input type="text" id="accountant" class="form-input" /></div>
-                        <div><label class="form-label">Delivery Date</label><input type="date" id="deliveryDate" class="form-input" /></div>
-                    </div>
-                </div>
-
-                <!-- File upload (images + optional PDF) -->
-                <div class="section-card no-print mb-2 text-xs">
-                    <label class="form-label">Upload Images (max 3) & optional PDF</label>
-                    <input type="file" id="fileUpload" class="form-input text-xs" multiple accept="image/*,.pdf" />
-                    <p class="text-xs text-gray-600 mt-1">Rules: Up to 3 images. If PDF uploaded it will be embedded as preview. Attempts >3 images will be rejected.</p>
-                    <p id="err-attachments" class="text-red-600 text-xs hidden">Attachment error</p>
-                </div>
-
-                <div id="filePreview" class="file-preview-container" aria-live="polite"></div>
-
-                <!-- Signatures -->
-                <div class="grid grid-cols-2 gap-4 mt-4 pt-3 border-t-2 border-blue-600 text-xs">
-                    <div>
-                        <div class="form-label mb-6">Customer Signature</div>
-                        <div class="border-t-2 border-gray-400 pt-1">_</div>
-                    </div>
-                    <div>
-                        <div class="form-label mb-6">Manager Signature</div>
-                        <div class="border-t-2 border-gray-400 pt-1">_</div>
-                    </div>
-                </div>
-
-                <div class="text-center text-xs mt-3 pt-2 border-t border-blue-600 text-blue-700 font-semibold">Quality Packaging Solutions | www.almisk.ae</div>
+              <div>
+                <label class="block text-sm font-semibold text-blue-800">Dimensions / Notes</label>
+                <input name="dimensions" id="dimensions" type="text" placeholder="e.g., 200×150×80 mm" class="mt-1 w-full border rounded px-3 py-2">
+              </div>
             </div>
-        </div>
+          </div>
 
-        <!-- Small action row under form (no-print) -->
-        <div class="no-print mt-3 flex gap-2">
-            <button id="btnPreviewPrintColor" class="control-button">Preview & Print Color</button>
-            <button id="btnPreviewPrintBW" class="control-button" style="background:linear-gradient(135deg,#64748b 0%,#475569 100%);">Preview & Print B&W</button>
-            <button id="btnSaveDraftFooter" class="control-button" style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);">Save Draft</button>
-            <button id="btnClearFormFooter" class="control-button" style="background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);">Clear Form</button>
-        </div>
-    </div>
+      <!-- Production Specs -->
+<div>
+  <div class="text-sm font-semibold text-blue-900 mb-2">PRODUCTION SPECIFICATIONS</div>
+  
+  <!-- Two neat rows -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+    <select name="printingType" id="printingType" class="mt-1 w-full border rounded px-3 py-2">
+      <option>Offset</option>
+      <option>Digital</option>
+    </select>
 
-    <!-- Right: Jobs / Todo panel -->
-    <div class="w-96">
-        <div class="bg-white rounded shadow p-4 sticky top-8">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="font-semibold">Jobs / Todo</h2>
-                <div id="jobsCount" class="text-sm text-gray-600">0</div>
-            </div>
+    <select name="lamination" id="lamination" class="mt-1 w-full border rounded px-3 py-2">
+      <option>None</option>
+      <option>Glossy</option>
+      <option>Matt</option>
+      <option>Soft-touch</option>
+    </select>
 
-            <div id="jobsList" class="space-y-3 max-h-[70vh] overflow-auto" aria-live="polite"></div>
+    <select name="foiling" id="foiling" class="mt-1 w-full border rounded px-3 py-2">
+      <option>None</option>
+      <option>Gold</option>
+      <option>Silver</option>
+      <option>Rose Gold</option>
+    </select>
 
-            <div class="mt-4 flex gap-2">
-                <button id="btnExportAllJobs" class="control-button w-full" style="background:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%);">Export All Jobs JSON</button>
-                <button id="btnClearAllJobs" class="control-button w-full" style="background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);">Clear All</button>
-            </div>
-        </div>
-    </div>
+    <select name="dieCutting" id="dieCutting" class="mt-1 w-full border rounded px-3 py-2">
+      <option>None</option>
+      <option>Full Cut</option>
+      <option>Half Cut</option>
+    </select>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <select name="embossingUV" id="embossingUV" class="mt-1 w-full border rounded px-3 py-2">
+      <option>None</option>
+      <option>Embossing</option>
+      <option>Spot UV</option>
+    </select>
+
+    <select name="foamType" id="foamType" class="mt-1 w-full border rounded px-3 py-2">
+      <option>None</option>
+      <option>PVC</option>
+      <option>Velvet</option>
+      <option>PU</option>
+    </select>
+
+    <select name="paperType" id="paperType" class="mt-1 w-full border rounded px-3 py-2">
+      <option>Gray Board</option>
+      <option>Food Board</option>
+      <option>Art Matt</option>
+      <option>Sticker</option>
+      <option>Special Paper</option>
+    </select>
+  </div>
 </div>
 
-<!-- Modal for job view/print -->
-<div id="modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
-    <div class="bg-white rounded shadow-lg w-[210mm] max-w-full mx-4 overflow-auto print:mx-0 print:w-[210mm]" role="dialog" aria-modal="true">
-        <div class="flex justify-between items-center p-3 border-b">
-            <h3 id="modalTitle" class="font-semibold">Job Preview</h3>
-            <div class="flex gap-2">
-                <button id="modalPrintColor" class="px-3 py-1 bg-indigo-600 text-white rounded">Print Color</button>
-                <button id="modalPrintBW" class="px-3 py-1 bg-gray-300 text-gray-800 rounded">Print B&W</button>
-                <button id="modalClose" class="px-3 py-1 bg-red-500 text-white rounded">Close</button>
-            </div>
-        </div>
-        <div id="modalContent" class="p-4"></div>
-    </div>
-</div>
 
-<input type="file" id="jsonImport" accept=".json" style="display:none" />
+          <!-- Remarks -->
+          <div>
+            <label class="block text-sm font-semibold text-blue-800">Remarks (max 500)</label>
+            <textarea name="remarks" id="remarks" maxlength="500" class="mt-1 w-full border rounded px-3 py-2 h-10"></textarea>
+            <div id="charCount" class="text-right text-xs text-gray-500 mt-1">0/500</div>
+          </div>
+
+          <!-- Attachments -->
+          <div>
+            <label class="block text-sm font-semibold text-blue-800">Upload Files (images only, max 5)</label>
+            <input id="attachments" type="file" accept="image/*,.pdf" multiple class="mt-1 w-full border rounded px-3 py-2">
+            <p class="text-xs text-gray-500 mt-1">Up to 5 images; PDFs will show filename preview.</p>
+
+            <!-- preview grid: 3 per row on md -->
+            <div id="attachmentPreview" class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-3"></div>
+          </div>
+
+          <!-- manager / accountant / delivery -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-sm font-semibold text-blue-800">Manager (Production)</label>
+              <input name="managerProduction" id="managerProduction" type="text" class="mt-1 w-full border rounded px-3 py-2">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-blue-800">Accountant</label>
+              <input name="accountant" id="accountant" type="text" class="mt-1 w-full border rounded px-3 py-2">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-blue-800">Delivery Date</label>
+              <input name="deliveryDate" id="deliveryDate" type="date" class="mt-1 w-full border rounded px-3 py-2">
+            </div>
+          </div>
+
+          <!-- signatures -->
+          <div class="grid grid-cols-2 gap-4 pt-4 text-sm text-gray-600">
+            <div class="border-t border-gray-300 pt-2 text-center">Customer Signature</div>
+            <div class="border-t border-gray-300 pt-2 text-center">Manager Signature</div>
+          </div>
+
+          <p class="text-center text-xs text-blue-600">Quality Packaging Solutions | www.almisk.ae</p>
+
+          <!-- Submit hidden (we will use custom buttons) -->
+          <button type="submit" id="submitBtn" class="hidden">Submit</button>
+        </form>
+
+        <!-- actions -->
+        <div class="mt-5 flex flex-wrap gap-3 justify-center">
+          <button id="addJobBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold">➕ Add Job</button>
+          <button id="printColor" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded font-semibold">🖨 Print Color</button>
+          <button id="printBW" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-semibold">🖨 Print B&W</button>
+          <button id="saveDraft" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-semibold">💾 Save Draft</button>
+          <button id="clearForm" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-semibold">🧹 Clear Form</button>
+          <button id="exportAllJSON" class="bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded font-semibold">📦 Export All JSON</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: JOB LIST -->
+      <div class="w-full hidden  md:w-80 bg-white shadow-lg rounded-2xl p-4">
+        <h3 class="flex items-center justify-between text-lg font-semibold text-blue-700 mb-3 border-b pb-2">
+          Jobs / Todo
+          <span id="jobCount" class="text-sm bg-blue-50 text-gray-700 px-2 py-0.5 rounded">0</span>
+        </h3>
+
+        <div id="jobList" class="space-y-2 text-sm text-gray-700 min-h-[120px]">
+          <p>No jobs yet. Add via form.</p>
+        </div>
+
+        <div class="mt-4 flex flex-col gap-2">
+          <button id="clearAllJobs" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded">🗑 Clear All</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script>
-/*
- Enhanced job-order single-file HTML
- - Preserves AL MISK design provided by user.
- - Adds persistent Jobs / Todo system, Confirm & Add Job logic, pending alerts, mark complete, delete, print/export (color/BW), attachments rules (max 3 images + optional 1 PDF).
- - Key behaviors:
-   * Invoice assignment occurs ONLY when Confirm & Add Job is clicked. Until then invoice field remains placeholder.
-   * Jobs persist in localStorage key 'jobOrders'.
-   * lastInvoiceNumber stored under 'lastInvoiceNumber' (number). Default seed start = 1000 if absent.
-   * Draft saved under 'jobOrderDraft' via Save Draft.
-   * Pending alert: if deliveryDate is past and job status != Completed, shows "PENDING" alert in job card.
-   * PDF export uses html2pdf and attempts single-A4 page by scaling content if taller than A4 available height.
- - Keyboard shortcuts: Ctrl/Cmd+S saves draft, Ctrl/Cmd+P triggers Print Color preview export.
-*/
+/* -------------------------
+  Functional JS: form + jobs
+   - Add job
+   - Render jobs
+   - Load job into form
+   - ProductType -> model logic (Box => input)
+   - Attachments preview (max 5)
+   - Draft autosave + manual save
+   - Print color / B&W
+------------------------- */
 
-/* Configuration */
-const DEFAULT_INVOICE_START = 1000;
-const MAX_IMAGES = 3;
-const STORAGE_JOBS = 'jobOrders';
-const STORAGE_LAST_INVOICE = 'lastInvoiceNumber';
-const STORAGE_DRAFT = 'jobOrderDraft';
+document.addEventListener('DOMContentLoaded', () => {
+  // Elements
+  const form = document.getElementById('jobForm');
+  const addJobBtn = document.getElementById('addJobBtn');
+  const jobListEl = document.getElementById('jobList');
+  const jobCountEl = document.getElementById('jobCount');
+  const attachmentsInput = document.getElementById('attachments');
+  const attachmentPreview = document.getElementById('attachmentPreview');
+  const remarks = document.getElementById('remarks');
+  const charCount = document.getElementById('charCount');
+  const productType = document.getElementById('productType');
+  const modelContainer = document.getElementById('modelContainer');
+  const invoiceNumberField = document.getElementById('invoiceNumber');
 
-/* DOM refs */
-const orderDate = document.getElementById('orderDate');
-const invoiceNo = document.getElementById('invoiceNo');
-const contactPerson = document.getElementById('contactPerson');
-const telMob = document.getElementById('telMob');
-const companyName = document.getElementById('companyName');
-const quantity = document.getElementById('quantity');
-const kindOfJob = document.getElementById('kindOfJob');
-const productType = document.getElementById('productType');
-const modelSelect = document.getElementById('model');
-const dimensions = document.getElementById('dimensions');
-const printingType = document.getElementById('printingType');
-const lamination = document.getElementById('lamination');
-const foilingType = document.getElementById('foilingType');
-const dieCutting = document.getElementById('dieCutting');
-const embossingUV = document.getElementById('embossingUV');
-const foamType = document.getElementById('foamType');
-const paperType = document.getElementById('paperType');
-const specialPaperDiv = document.getElementById('specialPaperDiv');
-const specialPaper = document.getElementById('specialPaper');
-const remarks = document.getElementById('remarks');
-const charCount = document.getElementById('charCount');
-const manager = document.getElementById('manager');
-const accountant = document.getElementById('accountant');
-const deliveryDate = document.getElementById('deliveryDate');
-const fileUpload = document.getElementById('fileUpload');
-const filePreview = document.getElementById('filePreview');
+  // Buttons
+  const saveDraftBtn = document.getElementById('saveDraft');
+  const clearFormBtn = document.getElementById('clearForm');
+  const printColorBtn = document.getElementById('printColor');
+  const printBWBtn = document.getElementById('printBW');
+  const exportAllJSONBtn = document.getElementById('exportAllJSON');
+  const clearAllJobsBtn = document.getElementById('clearAllJobs');
 
-const btnConfirmAdd = document.getElementById('btnConfirmAdd');
-const btnSaveDraft = document.getElementById('btnSaveDraft');
-const btnLoadDraft = document.getElementById('btnLoadDraft');
-const btnExportAll = document.getElementById('btnExportAll');
-const btnPrintColor = document.getElementById('btnPrintColor');
-const btnPrintBW = document.getElementById('btnPrintBW');
-const btnClearForm = document.getElementById('btnClearForm');
-const btnConfirmAddFooter = document.getElementById('btnConfirmAddFooter');
-const btnPreviewPrintColor = document.getElementById('btnPreviewPrintColor');
-const btnPreviewPrintBW = document.getElementById('btnPreviewPrintBW');
-const btnSaveDraftFooter = document.getElementById('btnSaveDraftFooter');
-const btnClearFormFooter = document.getElementById('btnClearFormFooter');
+  // Model options map
+  const modelOptions = {
+    Box: ["RSC (Regular Slotted Container)", "Auto-Lock Bottom", "Die-cut Window Box"],
+    Bag: ["Flat Bag", "D-cut Handle Bag", "Punch Handle Bag"],
+    Sleeve: ["Slip Sleeve", "Drawer Sleeve", "Telescopic Sleeve"],
+    Envelope: ["Standard Flap", "Window Envelope", "Wallet Flap"]
+  };
 
-const jobsList = document.getElementById('jobsList');
-const jobsCount = document.getElementById('jobsCount');
-const btnExportAllJobs = document.getElementById('btnExportAllJobs');
-const btnClearAllJobs = document.getElementById('btnClearAllJobs');
+  // Utility: jobs storage
+  const getJobs = () => JSON.parse(localStorage.getItem('jobs') || '[]');
+  const saveJobs = (arr) => localStorage.setItem('jobs', JSON.stringify(arr));
 
-const savedIndicator = document.getElementById('savedIndicator');
+  // Invoice generator
+  function generateInvoice() {
+    let last = parseInt(localStorage.getItem('lastInvoiceNumber') || '1000', 10);
+    last += 1;
+    localStorage.setItem('lastInvoiceNumber', last);
+    return `INV-${last}`;
+  }
 
-const modal = document.getElementById('modal');
-const modalContent = document.getElementById('modalContent');
-const modalTitle = document.getElementById('modalTitle');
-const modalClose = document.getElementById('modalClose');
-const modalPrintColor = document.getElementById('modalPrintColor');
-const modalPrintBW = document.getElementById('modalPrintBW');
+  // Keep invoice number shown as next invoice when form loads
+  function refreshInvoicePreview() {
+    const next = parseInt(localStorage.getItem('lastInvoiceNumber') || '1000', 10) + 1;
+    invoiceNumberField.value = `INV-${next}`;
+  }
+  refreshInvoicePreview();
 
-const jsonImport = document.getElementById('jsonImport');
-
-/* State for attachments before confirm */
-let attachments = { images: [], pdf: null };
-
-/* Product models for dependent dropdown */
-const PRODUCT_MODELS = {
-    Box: ['RSC (Regular Slotted Container)', 'Auto-Lock Bottom', 'Die-cut Window Box'],
-    Bag: ['Flat Bag', 'D-cut Handle Bag', 'Punch Handle Bag'],
-    Sleeve: ['Slip Sleeve', 'Drawer Sleeve', 'Telescopic Sleeve'],
-    Envelope: ['Standard Flap', 'Window Envelope', 'Wallet Flap']
-};
-
-/* Helpers */
-function qs(sel) { return document.querySelector(sel); }
-function qsa(sel) { return Array.from(document.querySelectorAll(sel)); }
-
-/* Initialization */
-(function init() {
-    // Do not assign invoice on load. Invoice assigned only on confirm.
-    orderDate.valueAsDate = new Date();
-    // populate models when productType changes
-    productType.addEventListener('change', onProductTypeChange);
-    onProductTypeChange(); // set initial
-
-    // attachments
-    fileUpload.addEventListener('change', handleFileUpload);
-
-    // remarks char count
-    remarks.addEventListener('input', () => { charCount.textContent = remarks.value.length; });
-
-    // button handlers
-    btnConfirmAdd.addEventListener('click', confirmAndAddJob);
-    if (btnSaveDraft) btnSaveDraft.addEventListener('click', saveDraft);
-    if (btnLoadDraft) btnLoadDraft.addEventListener('click', loadDraft);
-    if (btnExportAll) btnExportAll.addEventListener('click', exportAllJobsJSON);
-    if (btnPrintColor) btnPrintColor.addEventListener('click', () => previewPrint(false));
-    if (btnPrintBW) btnPrintBW.addEventListener('click', () => previewPrint(true));
-    if (btnClearForm) btnClearForm.addEventListener('click', clearFormConfirm);
-    if (btnPreviewPrintColor) btnPreviewPrintColor.addEventListener('click', () => previewPrint(false));
-    if (btnPreviewPrintBW) btnPreviewPrintBW.addEventListener('click', () => previewPrint(true));
-    if (btnSaveDraftFooter) btnSaveDraftFooter.addEventListener('click', saveDraft);
-    if (btnClearFormFooter) btnClearFormFooter.addEventListener('click', clearFormConfirm);
-    if (btnExportAllJobs) btnExportAllJobs.addEventListener('click', exportAllJobsJSON);
-    if (btnClearAllJobs) btnClearAllJobs.addEventListener('click', clearAllJobs);
-    if (jsonImport) jsonImport.addEventListener('change', handleJSONImport);
-
-    modalClose.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-
-    // load persisted jobs & draft
-    refreshJobsList();
-    loadDraftOnStart();
-
-    // autosave draft
-    setInterval(autoSaveDraft, 30000);
-
-    // keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-        const meta = navigator.platform.toUpperCase().includes('MAC') ? e.metaKey : e.ctrlKey;
-        if (meta && e.key.toLowerCase() === 's') { e.preventDefault(); saveDraft(); }
-        if (meta && e.key.toLowerCase() === 'p') { e.preventDefault(); previewPrint(false); }
+  // Render jobs
+  function renderJobs() {
+    const jobs = getJobs();
+    jobListEl.innerHTML = '';
+    if (!jobs.length) {
+      jobListEl.innerHTML = '<p>No jobs yet. Add via form.</p>';
+      jobCountEl.textContent = '0';
+      return;
+    }
+    jobs.forEach((job, i) => {
+      const div = document.createElement('div');
+      div.className = 'p-2 border rounded hover:bg-blue-50 cursor-pointer flex items-center justify-between';
+      const left = document.createElement('div');
+      left.innerHTML = `<div class="font-semibold text-sm">${job.invoice}</div>
+                        <div class="text-xs text-gray-600">${job.contactPerson || 'N/A'} — ${job.companyName || 'N/A'}</div>
+                        <div class="text-xs text-gray-500">${job.productType || ''} / ${job.modelVariant || ''}</div>`;
+      const right = document.createElement('div');
+      right.innerHTML = `<div class="text-xs px-2 py-1 rounded text-white bg-yellow-500">Todo</div>`;
+      div.appendChild(left);
+      div.appendChild(right);
+      div.addEventListener('click', () => loadJob(i));
+      jobListEl.appendChild(div);
     });
-})();
+    jobCountEl.textContent = jobs.length.toString();
+  }
 
-/* Product type change -> populate model and show/hide special paper */
-function onProductTypeChange() {
-    const t = productType.value;
-    modelSelect.innerHTML = '';
-    if (!t) { modelSelect.innerHTML = '<option value="">Select type first</option>'; return; }
-    modelSelect.appendChild(new Option('Select model...', ''));
-    (PRODUCT_MODELS[t] || []).forEach(m => modelSelect.appendChild(new Option(m, m)));
-}
+  // Load job into form
+  function loadJob(index) {
+    const jobs = getJobs();
+    if (!jobs[index]) return;
+    const job = jobs[index];
 
-/* File upload handling: up to 3 images and optional 1 PDF; reject >3 images */
-function handleFileUpload(e) {
-    const files = Array.from(fileUpload.files || []);
-    // Reset previous attachments if user re-selected (we allow adding by reselect too)
-    // We'll append but enforce max images.
-    const newImages = [];
-    let newPdf = null;
-    for (const f of files) {
-        if (f.type.startsWith('image/')) newImages.push(f);
-        else if (f.type === 'application/pdf') {
-            if (!attachments.pdf && !newPdf) newPdf = f;
-            else {
-                showInlineError('err-attachments', 'Only one PDF allowed.');
-            }
-        }
-    }
+    // Reset model container before setting
+    setModelInputForProduct(job.productType || '');
 
-    if (attachments.images.length + newImages.length > MAX_IMAGES) {
-        showInlineError('err-attachments', Max ${MAX_IMAGES} images allowed.);
-        fileUpload.value = '';
-        return;
-    }
+    // Fill fields
+    const fields = [
+      'orderDate','invoiceNumber','contactPerson','telephone','companyName','quantity','kindOfJob',
+      'dimensions','printingType','lamination','foiling','dieCutting','embossingUV','foamType','paperType',
+      'remarks','managerProduction','accountant','deliveryDate'
+    ];
+    fields.forEach(name => {
+      const el = form.elements[name];
+      if (el) el.value = job[name] || '';
+    });
 
-    // convert new files to data URLs and push to attachments
-    const readPromises = newImages.map(f => readFileAsDataURL(f).then(dataUrl => ({ name: f.name, dataUrl })));
-    Promise.all(readPromises).then(results => {
-        attachments.images.push(...results);
-        if (newPdf) {
-            readFileAsDataURL(newPdf).then(dataUrl => {
-                attachments.pdf = { name: newPdf.name, dataUrl };
-                renderAttachments();
-            });
+    // modelVariant may be in select or input
+    const modelSelect = document.getElementById('modelVariantSelect');
+    const modelInput = document.getElementById('modelVariantInput');
+    if (modelSelect) modelSelect.value = job.modelVariant || '';
+    if (modelInput) modelInput.value = job.modelVariant || '';
+
+    // attachments preview won't be reloaded (we only stored filenames); show filenames if present
+    attachmentPreview.innerHTML = '';
+    if (job.attachments && job.attachments.length) {
+      job.attachments.slice(0,5).forEach(att => {
+        if (att.type === 'image' && att.dataUrl) {
+          const img = document.createElement('img');
+          img.src = att.dataUrl;
+          img.className = 'w-full h-24 object-cover rounded border';
+          attachmentPreview.appendChild(img);
         } else {
-            renderAttachments();
+          const p = document.createElement('div');
+          p.className = 'text-xs text-gray-600 p-2 border rounded';
+          p.textContent = att.name || 'file';
+          attachmentPreview.appendChild(p);
         }
-    }).catch(err => console.error(err));
-    fileUpload.value = '';
-}
-
-/* read file to dataURL */
-function readFileAsDataURL(file) {
-    return new Promise((res, rej) => {
-        const fr = new FileReader();
-        fr.onload = () => res(fr.result);
-        fr.onerror = rej;
-        fr.readAsDataURL(file);
-    });
-}
-
-/* Render attachments preview with layout rules for 1/2/3 images and embed PDF preview */
-function renderAttachments() {
-    filePreview.innerHTML = '';
-    // PDF preview first (if exists)
-    if (attachments.pdf) {
-        const pdfWrap = document.createElement('div');
-        pdfWrap.className = 'border-2 border-blue-200 p-1 rounded bg-blue-50';
-        const embed = document.createElement('object');
-        embed.type = 'application/pdf';
-        embed.data = attachments.pdf.dataUrl;
-        embed.width = '100%';
-        embed.style.height = '140px';
-        embed.className = 'file-preview';
-        pdfWrap.appendChild(embed);
-        const name = document.createElement('div'); name.className = 'text-xs text-center mt-1 text-blue-700 font-semibold truncate'; name.textContent = attachments.pdf.name;
-        pdfWrap.appendChild(name);
-        const rem = document.createElement('button'); rem.className = 'text-xs text-red-600 mt-1 underline'; rem.textContent = 'Remove PDF';
-        rem.addEventListener('click', () => { attachments.pdf = null; renderAttachments(); });
-        pdfWrap.appendChild(rem);
-        filePreview.appendChild(pdfWrap);
+      });
     }
 
-    const imgs = attachments.images || [];
-    if (imgs.length === 0) return;
-    // Build container for images layout
-    const gridClass = imgs.length === 1 ? 'img-grid-1' : (imgs.length === 2 ? 'img-grid-2' : 'img-grid-3');
-    const wrapper = document.createElement('div');
-    wrapper.className = gridClass + ' flex';
-    imgs.forEach((im, idx) => {
-        const col = document.createElement('div');
-        col.className = 'img-col';
-        col.style.width = imgs.length === 1 ? '100%' : (imgs.length === 2 ? '50%' : '33.3333%');
-        col.innerHTML = `
-            <div class="relative border rounded overflow-hidden bg-white p-1">
-                <img src="${im.dataUrl}" alt="${escapeHtml(im.name)}" class="attach-img" />
-                <div class="mt-2 flex justify-between items-center">
-                    <span class="text-xs text-gray-600">${escapeHtml(im.name)}</span>
-                    <button class="text-xs text-red-600 remove-image" data-idx="${idx}">Remove</button>
-                </div>
-            </div>
-        `;
-        wrapper.appendChild(col);
-    });
-    filePreview.appendChild(wrapper);
+    showToast('Loaded job into form', 'info');
+  }
 
-    qsa('.remove-image').forEach(btn => btn.addEventListener('click', (e) => {
-        const idx = Number(btn.dataset.idx);
-        attachments.images.splice(idx, 1);
-        renderAttachments();
-    }));
-}
-
-/* small helper to escape html text */
-function escapeHtml(s) { return (s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-/* Inline error show */
-function showInlineError(id, msg) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = msg;
-    el.classList.remove('hidden');
-    setTimeout(() => el.classList.add('hidden'), 3500);
-}
-
-/* Validate required fields (inline) - returns boolean */
-function validateFormForAdd() {
-    let ok = true;
-    if (!orderDate.value) { document.getElementById('err-orderDate').classList.remove('hidden'); ok=false; } else document.getElementById('err-orderDate').classList.add('hidden');
-    if (!contactPerson.value.trim()) { document.getElementById('err-contactPerson').classList.remove('hidden'); ok=false; } else document.getElementById('err-contactPerson').classList.add('hidden');
-    if (!telMob.value.trim()) { document.getElementById('err-telMob').classList.remove('hidden'); ok=false; } else document.getElementById('err-telMob').classList.add('hidden');
-    if (!quantity.value || Number(quantity.value) < 1) { document.getElementById('err-quantity').classList.remove('hidden'); ok=false; } else document.getElementById('err-quantity').classList.add('hidden');
-    if (!productType.value) { document.getElementById('err-productType').classList.remove('hidden'); ok=false; } else document.getElementById('err-productType').classList.add('hidden');
-    if (!modelSelect.value) { document.getElementById('err-model').classList.remove('hidden'); ok=false; } else document.getElementById('err-model').classList.add('hidden');
-    return ok;
-}
-
-/* Invoice assignment logic: increment only when confirming add */
-function getNextInvoice() {
-    let last = Number(localStorage.getItem(STORAGE_LAST_INVOICE));
-    if (!last || Number.isNaN(last)) last = DEFAULT_INVOICE_START;
-    const next = last + 1;
-    localStorage.setItem(STORAGE_LAST_INVOICE, String(next));
-    return 'INV-' + next;
-}
-
-/* Collect job object from form (attachments current state). If assignInvoice = true -> assign invoice now. */
-function collectJobObject(assignInvoice=false) {
-    return {
-        invoice: assignInvoice ? getNextInvoice() : null,
-        orderDate: orderDate.value || null,
-        contactPerson: contactPerson.value.trim(),
-        telMob: telMob.value.trim(),
-        companyName: companyName.value.trim(),
-        quantity: Number(quantity.value) || 0,
-        kindOfJob: kindOfJob.value.trim(),
-        productType: productType.value,
-        model: modelSelect.value,
-        dimensions: dimensions.value.trim(),
-        printingType: printingType.value,
-        lamination: lamination.value,
-        foilingType: foilingType.value,
-        dieCutting: dieCutting.value,
-        embossingUV: embossingUV.value,
-        foamType: foamType.value,
-        paperType: paperType.value,
-        specialPaper: specialPaper.value,
-        remarks: remarks.value.trim(),
-        manager: manager.value.trim(),
-        accountant: accountant.value.trim(),
-        deliveryDate: deliveryDate.value || null,
-        attachments: {
-            images: attachments.images.map(i => ({ name: i.name, dataUrl: i.dataUrl })),
-            pdf: attachments.pdf ? { name: attachments.pdf.name, dataUrl: attachments.pdf.dataUrl } : null
-        },
-        status: 'Todo',
-        createdAt: Date.now()
-    };
-}
-
-/* Confirm & Add Job: validate -> assign invoice -> persist -> reset form (but keep lastInvoiceNumber persisted) */
-function confirmAndAddJob() {
-    if (!validateFormForAdd()) { alert('Please fix required fields.'); return; }
-    const job = collectJobObject(true); // assigning invoice here
-    invoiceNo.value = job.invoice; // show assigned invoice
-    const jobs = readJobs();
-    jobs.unshift(job); // newest first
-    writeJobs(jobs);
-    showToast(Job added ${job.invoice}, 'success');
-    // reset form but leave invoiceNo displayed for confirmation; clear attachments
-    clearForm(false);
-}
-
-/* localStorage helpers */
-function readJobs() {
-    try {
-        const raw = localStorage.getItem(STORAGE_JOBS);
-        return raw ? JSON.parse(raw) : [];
-    } catch (e) {
-        console.error('Failed to parse jobs', e);
-        return [];
-    }
-}
-function writeJobs(arr) {
-    localStorage.setItem(STORAGE_JOBS, JSON.stringify(arr));
-    refreshJobsList();
-}
-
-/* Render jobs list */
-function refreshJobsList() {
-    const jobs = readJobs();
-    jobsList.innerHTML = '';
-    jobsCount.textContent = String(jobs.length);
-    if (jobs.length === 0) { jobsList.innerHTML = '<p class="text-sm text-gray-500">No jobs yet. Add via form.</p>'; return; }
-
-    jobs.forEach((job, idx) => {
-        const card = document.createElement('div');
-        card.className = 'border rounded p-3 bg-white shadow-sm';
-        // pending alert if delivery date passed and not completed
-        let pendingHtml = '';
-        if (job.deliveryDate && job.status !== 'Completed') {
-            const del = new Date(job.deliveryDate);
-            const now = new Date();
-            if (del < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
-                pendingHtml = <div class="pending-alert mb-2">⚠ PENDING: Delivery date passed (${escapeHtml(job.deliveryDate)})</div>;
-            }
-        }
-        card.innerHTML = `
-            ${pendingHtml}
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <div class="flex items-baseline gap-2">
-                        <h4 class="font-semibold">${escapeHtml(job.invoice || '(No Invoice)')}</h4>
-                        <span class="text-xs text-gray-600">${escapeHtml(job.productType)} • ${escapeHtml(job.model)}</span>
-                    </div>
-                    <div class="text-sm text-gray-600">${escapeHtml(job.companyName || job.contactPerson)}</div>
-                    <div class="text-xs text-gray-500">Qty: ${escapeHtml(String(job.quantity))} • Delivery: ${escapeHtml(job.deliveryDate || '—')}</div>
-                </div>
-                <div class="text-right">
-                    <div class="mb-2">
-                        <span class="job-badge ${job.status==='Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${escapeHtml(job.status)}</span>
-                    </div>
-                    <div class="flex flex-col gap-1">
-                        <button class="text-xs view-job text-indigo-600 hover:underline" data-idx="${idx}">View</button>
-                        <button class="text-xs print-job text-gray-700 hover:underline" data-idx="${idx}">Print</button>
-                        <button class="text-xs export-json text-gray-700 hover:underline" data-idx="${idx}">Export JSON</button>
-                        <button class="text-xs mark-complete text-green-700 hover:underline" data-idx="${idx}">${job.status === 'Completed' ? 'Reopen' : 'Mark Completed'}</button>
-                        <button class="text-xs delete-job text-red-700 hover:underline" data-idx="${idx}">Delete</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        jobsList.appendChild(card);
-    });
-
-    // attach handlers
-    qsa('.view-job').forEach(btn => btn.addEventListener('click', e => openJobModal(Number(btn.dataset.idx))));
-    qsa('.print-job').forEach(btn => btn.addEventListener('click', e => printJobByIndex(Number(btn.dataset.idx), false)));
-    qsa('.export-json').forEach(btn => btn.addEventListener('click', e => {
-        const job = readJobs()[Number(btn.dataset.idx)];
-        if (!job) return;
-        downloadJson(job, job-${job.invoice || 'no-invoice'}.json);
-    }));
-    qsa('.mark-complete').forEach(btn => btn.addEventListener('click', e => toggleComplete(Number(btn.dataset.idx))));
-    qsa('.delete-job').forEach(btn => btn.addEventListener('click', e => deleteJob(Number(btn.dataset.idx))));
-}
-
-/* Toggle complete/reopen */
-function toggleComplete(idx) {
-    const jobs = readJobs();
-    if (!jobs[idx]) return;
-    jobs[idx].status = (jobs[idx].status === 'Completed') ? 'Todo' : 'Completed';
-    writeJobs(jobs);
-    showToast(Job ${jobs[idx].invoice} status: ${jobs[idx].status}, 'info');
-}
-
-/* Delete job */
-function deleteJob(idx) {
-    const jobs = readJobs();
-    if (!jobs[idx]) return;
-    if (!confirm(Delete ${jobs[idx].invoice || 'this job'}?)) return;
-    jobs.splice(idx, 1);
-    writeJobs(jobs);
-    showToast('Job deleted', 'info');
-}
-
-/* Clear all jobs */
-function clearAllJobs() {
-    if (!confirm('Clear all jobs from localStorage?')) return;
-    localStorage.removeItem(STORAGE_JOBS);
-    refreshJobsList();
-    showToast('All jobs cleared', 'info');
-}
-
-/* Export all jobs JSON */
-function exportAllJobsJSON() {
-    const jobs = readJobs();
-    if (!jobs || jobs.length === 0) { alert('No jobs to export'); return; }
-    downloadJson(jobs, 'all-jobs.json');
-}
-
-/* Download helper */
-function downloadJson(obj, filename) {
-    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-}
-
-/* Save draft (stores current form + attachments) */
-function saveDraft() {
-    const draft = {
-        form: {
-            orderDate: orderDate.value, contactPerson: contactPerson.value, telMob: telMob.value, companyName: companyName.value,
-            quantity: quantity.value, kindOfJob: kindOfJob.value, productType: productType.value, model: modelSelect.value,
-            dimensions: dimensions.value, printingType: printingType.value, lamination: lamination.value, foilingType: foilingType.value,
-            dieCutting: dieCutting.value, embossingUV: embossingUV.value, foamType: foamType.value, paperType: paperType.value,
-            specialPaper: specialPaper.value, remarks: remarks.value, manager: manager.value, accountant: accountant.value, deliveryDate: deliveryDate.value
-        },
-        attachments
-    };
-    localStorage.setItem(STORAGE_DRAFT, JSON.stringify(draft));
-    showSavedIndicator();
-    showToast('Draft saved', 'success');
-}
-
-/* Load draft */
-function loadDraft() {
-    const raw = localStorage.getItem(STORAGE_DRAFT);
-    if (!raw) { alert('No draft found'); return; }
-    try {
-        const draft = JSON.parse(raw);
-        const f = draft.form || {};
-        orderDate.value = f.orderDate || '';
-        contactPerson.value = f.contactPerson || '';
-        telMob.value = f.telMob || '';
-        companyName.value = f.companyName || '';
-        quantity.value = f.quantity || '';
-        kindOfJob.value = f.kindOfJob || '';
-        productType.value = f.productType || '';
-        onProductTypeChange();
-        setTimeout(() => modelSelect.value = f.model || '', 120);
-        dimensions.value = f.dimensions || '';
-        printingType.value = f.printingType || '';
-        lamination.value = f.lamination || '';
-        foilingType.value = f.foilingType || '';
-        dieCutting.value = f.dieCutting || '';
-        embossingUV.value = f.embossingUV || '';
-        foamType.value = f.foamType || '';
-        paperType.value = f.paperType || '';
-        specialPaper.value = f.specialPaper || '';
-        remarks.value = f.remarks || '';
-        charCount.textContent = remarks.value.length;
-        manager.value = f.manager || '';
-        accountant.value = f.accountant || '';
-        deliveryDate.value = f.deliveryDate || '';
-        attachments = draft.attachments || { images: [], pdf: null };
-        renderAttachments();
-        showToast('Draft loaded', 'info');
-    } catch (e) {
-        console.error(e);
-        alert('Failed to load draft');
-    }
-}
-
-/* Auto-save on interval */
-function autoSaveDraft() {
-    const draft = {
-        form: {
-            orderDate: orderDate.value, contactPerson: contactPerson.value, telMob: telMob.value, companyName: companyName.value,
-            quantity: quantity.value, kindOfJob: kindOfJob.value, productType: productType.value, model: modelSelect.value,
-            dimensions: dimensions.value, printingType: printingType.value, lamination: lamination.value, foilingType: foilingType.value,
-            dieCutting: dieCutting.value, embossingUV: embossingUV.value, foamType: foamType.value, paperType: paperType.value,
-            specialPaper: specialPaper.value, remarks: remarks.value, manager: manager.value, accountant: accountant.value, deliveryDate: deliveryDate.value
-        },
-        attachments
-    };
-    localStorage.setItem(STORAGE_DRAFT, JSON.stringify(draft));
-    showSavedIndicator();
-}
-
-/* Load draft on start if exists */
-function loadDraftOnStart() {
-    const raw = localStorage.getItem(STORAGE_DRAFT);
-    if (!raw) return;
-    // Do not auto-load silently; we will load but user can override. For convenience, load but do not alert.
-    try {
-        const draft = JSON.parse(raw);
-        const f = draft.form || {};
-        orderDate.value = f.orderDate || new Date().toISOString().slice(0,10);
-        contactPerson.value = f.contactPerson || '';
-        telMob.value = f.telMob || '';
-        companyName.value = f.companyName || '';
-        quantity.value = f.quantity || '';
-        kindOfJob.value = f.kindOfJob || '';
-        productType.value = f.productType || '';
-        onProductTypeChange();
-        setTimeout(() => modelSelect.value = f.model || '', 120);
-        dimensions.value = f.dimensions || '';
-        printingType.value = f.printingType || '';
-        lamination.value = f.lamination || '';
-        foilingType.value = f.foilingType || '';
-        dieCutting.value = f.dieCutting || '';
-        embossingUV.value = f.embossingUV || '';
-        foamType.value = f.foamType || '';
-        paperType.value = f.paperType || '';
-        specialPaper.value = f.specialPaper || '';
-        remarks.value = f.remarks || '';
-        charCount.textContent = remarks.value.length;
-        manager.value = f.manager || '';
-        accountant.value = f.accountant || '';
-        deliveryDate.value = f.deliveryDate || '';
-        attachments = draft.attachments || { images: [], pdf: null };
-        renderAttachments();
-    } catch (e) {
-        console.error('Failed to auto-load draft', e);
-    }
-}
-
-/* Clear form (ask confirm). If keepInvoice true -> do not clear invoiceNo display */
-function clearFormConfirm(keepInvoice=false) {
-    if (!confirm('⚠ Are you sure you want to clear all form data?')) return;
-    clearForm(keepInvoice);
-}
-
-/* Clear form implementation */
-function clearForm(keepInvoice=false) {
-    document.querySelectorAll('#contentWrapper input, #contentWrapper textarea, #contentWrapper select').forEach(el => {
-        if (el.id === 'invoiceNo' || el.id === 'orderDate') return; // preserve invoice display or date
-        if (el.type === 'date') el.value = '';
-        else if (el.tagName.toLowerCase() === 'select') el.selectedIndex = 0;
-        else el.value = '';
-    });
-    if (!keepInvoice) invoiceNo.value = '';
-    // reset attachments
-    attachments = { images: [], pdf: null };
-    filePreview.innerHTML = '';
-    fileUpload.value = '';
-    charCount.textContent = '0';
-    toggleSpecialPaper();
-}
-
-/* Toggle special paper input */
-function toggleSpecialPaper() {
-    const v = paperType.value;
-    specialPaperDiv.style.display = (v === 'special') ? 'block' : 'none';
-}
-
-/* Show saved indicator */
-function showSavedIndicator() {
-    savedIndicator.classList.add('show');
-    setTimeout(() => savedIndicator.classList.remove('show'), 1800);
-}
-
-/* Toast messages (simple) */
-function showToast(msg, type='info') {
-    // small unobtrusive toast at top center
+  // Show toast
+  function showToast(msg, type='info') {
     const t = document.createElement('div');
-    t.className = fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded text-white ${type==='success'?'bg-green-600':type==='error'?'bg-red-600':'bg-blue-600'};
+    t.className = 'fixed bottom-6 right-6 bg-blue-600 text-white px-4 py-2 rounded shadow';
+    if (type === 'success') t.style.background = '#16a34a';
+    if (type === 'error') t.style.background = '#dc2626';
     t.textContent = msg;
     document.body.appendChild(t);
-    setTimeout(() => t.style.opacity = '0', 2600);
-    setTimeout(() => t.remove(), 3000);
-}
+    setTimeout(()=> t.remove(), 2200);
+  }
 
-/* Modal: build printable container for a job and show */
-function openJobModal(idx) {
-    const jobs = readJobs();
-    const job = jobs[idx];
-    if (!job) return;
-    modalTitle.textContent = Preview ${job.invoice || ''};
-    modalContent.innerHTML = '';
-    const printable = buildPrintable(job);
-    modalContent.appendChild(printable);
-    modal.classList.remove('hidden');
+  // Character counter for remarks
+  remarks.addEventListener('input', () => {
+    charCount.textContent = `${remarks.value.length}/500`;
+  });
 
-    modalPrintColor.onclick = () => exportJobPdf(printable, job.invoice || 'no-invoice', false);
-    modalPrintBW.onclick = () => exportJobPdf(printable, job.invoice || 'no-invoice', true);
-}
-
-/* Close modal */
-function closeModal() { modal.classList.add('hidden'); modalContent.innerHTML = ''; }
-
-/* Build printable DOM for a job (compact) */
-function buildPrintable(job) {
-    const container = document.createElement('div');
-    container.style.boxSizing = 'border-box';
-    container.className = 'printable-container p-3 text-sm text-gray-900';
-    const header = document.createElement('div');
-    header.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div>
-                <h2 style="font-size:18px;margin:0">${escapeHtml(job.companyName || 'AL MISK')}</h2>
-                <div style="font-size:12px;color:#374151">${escapeHtml(job.contactPerson || '')} • ${escapeHtml(job.telMob || '')}</div>
-            </div>
-            <div style="text-align:right">
-                <div style="font-weight:600">${escapeHtml(job.invoice || '')}</div>
-                <div style="font-size:12px;color:#6b7280">Order: ${escapeHtml(job.orderDate || '')}</div>
-            </div>
-        </div>
-        <hr style="margin:8px 0" />
-    `;
-    container.appendChild(header);
-
-    const details = document.createElement('div');
-    details.innerHTML = `
-        <div><strong>Product:</strong> ${escapeHtml(job.productType)} • ${escapeHtml(job.model)}</div>
-        <div><strong>Qty:</strong> ${escapeHtml(String(job.quantity))} &nbsp; <strong>Delivery:</strong> ${escapeHtml(job.deliveryDate || '—')}</div>
-        <div><strong>Kind:</strong> ${escapeHtml(job.kindOfJob)} &nbsp; <strong>Dimensions:</strong> ${escapeHtml(job.dimensions)}</div>
-        <div style="margin-top:6px"><strong>Specs:</strong> ${escapeHtml(job.printingType||'')} ${escapeHtml(job.lamination||'')} ${escapeHtml(job.foilingType||'')}</div>
-        <div style="margin-top:6px"><strong>Remarks:</strong> ${escapeHtml(job.remarks||'')}</div>
-    `;
-    container.appendChild(details);
-
-    // attachments
-    if ((job.attachments && job.attachments.images && job.attachments.images.length) || (job.attachments && job.attachments.pdf)) {
-        const att = document.createElement('div'); att.style.marginTop = '8px';
-        att.innerHTML = <strong>Attachments:</strong>;
-        if (job.attachments.images && job.attachments.images.length) {
-            const imgs = job.attachments.images;
-            const gridClass = imgs.length === 1 ? 'img-grid-1' : (imgs.length === 2 ? 'img-grid-2' : 'img-grid-3');
-            const wrapper = document.createElement('div'); wrapper.className = gridClass + ' flex mt-2';
-            imgs.forEach(img => {
-                const col = document.createElement('div'); col.className = 'img-col'; col.style.width = imgs.length===1?'100%':(imgs.length===2?'50%':'33.3333%');
-                col.innerHTML = <img src="${img.dataUrl}" class="attach-img" alt="${escapeHtml(img.name)}" />;
-                wrapper.appendChild(col);
-            });
-            att.appendChild(wrapper);
+  // Attachments preview + store dataUrls in memory when adding job
+  attachmentsInput.addEventListener('change', (e) => {
+    attachmentPreview.innerHTML = '';
+    const files = Array.from(e.target.files).slice(0,5); // limit 5
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        if (file.type.startsWith('image/')) {
+          const img = document.createElement('img');
+          img.src = ev.target.result;
+          img.className = 'w-full h-24 object-cover rounded border';
+          attachmentPreview.appendChild(img);
+        } else {
+          const d = document.createElement('div');
+          d.className = 'text-xs text-gray-700 p-2 border rounded';
+          d.textContent = file.name;
+          attachmentPreview.appendChild(d);
         }
-        if (job.attachments.pdf) {
-            const pdfWrap = document.createElement('div'); pdfWrap.style.marginTop='8px';
-            pdfWrap.innerHTML = <object type="application/pdf" data="${job.attachments.pdf.dataUrl}" width="100%" style="height:200px;"></object>;
-            att.appendChild(pdfWrap);
-        }
-        container.appendChild(att);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  // Product type change: swap model input/select
+  function setModelInputForProduct(type) {
+    modelContainer.innerHTML = ''; // clear
+    const label = document.createElement('label');
+    label.className = 'block text-sm font-semibold text-blue-800';
+    label.textContent = 'Model / Variant *';
+    modelContainer.appendChild(label);
+
+    // For Box: use a free text input (user asked to change spinner to input)
+    if (type === 'Box') {
+      const input = document.createElement('input');
+      input.name = 'modelVariant';
+      input.id = 'modelVariantInput';
+      input.required = true;
+      input.placeholder = 'Type box model (e.g., RSC custom)';
+      input.className = 'mt-1 w-full border rounded px-3 py-2';
+      modelContainer.appendChild(input);
+    } else {
+      // use select with options (for Bag/Sleeve/Envelope and default)
+      const select = document.createElement('select');
+      select.name = 'modelVariant';
+      select.id = 'modelVariantSelect';
+      select.required = true;
+      select.className = 'mt-1 w-full border rounded px-3 py-2';
+      // default empty option
+      const optDefault = document.createElement('option');
+      optDefault.value = '';
+      optDefault.textContent = 'Select Model';
+      select.appendChild(optDefault);
+      if (modelOptions[type]) {
+        modelOptions[type].forEach(m => {
+          const o = document.createElement('option');
+          o.value = m;
+          o.textContent = m;
+          select.appendChild(o);
+        });
+      }
+      modelContainer.appendChild(select);
+    }
+  }
+
+  // initial model container default (select placeholder)
+  setModelInputForProduct('');
+
+  // on product type change
+  productType.addEventListener('change', (e) => {
+    setModelInputForProduct(e.target.value);
+  });
+
+  // Add job - validate and store
+  addJobBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    // collect required fields validation
+    const orderDate = form.elements['orderDate'].value.trim();
+    const contactPerson = form.elements['contactPerson'].value.trim();
+    const telephone = form.elements['telephone'].value.trim();
+    const quantity = form.elements['quantity'].value.trim();
+    const productTypeVal = form.elements['productType'].value;
+    const modelElSelect = document.getElementById('modelVariantSelect');
+    const modelElInput = document.getElementById('modelVariantInput');
+    const modelVariant = modelElInput ? modelElInput.value.trim() : (modelElSelect ? modelElSelect.value : '');
+
+    if (!orderDate || !contactPerson || !telephone || !quantity || !productTypeVal || !modelVariant) {
+      showToast('Please fill all required fields.', 'error');
+      return;
     }
 
-    const footer = document.createElement('div'); footer.style.marginTop='10px'; footer.style.fontSize='12px'; footer.style.color='#6b7280';
-    footer.textContent = Generated: ${new Date(job.createdAt).toLocaleString()} • Status: ${job.status};
-    container.appendChild(footer);
-
-    return container;
-}
-
-/* Export single job to PDF with single-page scaling logic
-   - clone node into hidden wrapper, measure, scale if needed, then html2pdf.
-*/
-async function exportJobPdf(printableNode, invoice, blackAndWhite=false) {
-    // clone
-    const clone = printableNode.cloneNode(true);
-    const wrapper = document.createElement('div');
-    wrapper.style.width = '210mm';
-    wrapper.style.boxSizing = 'border-box';
-    wrapper.style.padding = '8mm';
-    wrapper.style.background = 'white';
-    wrapper.style.position = 'fixed';
-    wrapper.style.left = '-9999px';
-    wrapper.style.top = '0';
-    wrapper.appendChild(clone);
-    document.body.appendChild(wrapper);
-
-    await waitForImagesToLoad(wrapper);
-
-    // convert mm to px (approx 96dpi)
-    const pxPerMm = 96 / 25.4;
-    const a4HeightPx = 297 * pxPerMm;
-    const marginMm = 8;
-    const availableHeightPx = (297 - (marginMm * 2)) * pxPerMm;
-
-    const contentHeight = wrapper.scrollHeight;
-    let scale = 1;
-    if (contentHeight > availableHeightPx) scale = availableHeightPx / contentHeight;
-    scale = Math.min(1, scale);
-
-    wrapper.style.transformOrigin = 'top left';
-    wrapper.style.transform = scale(${scale});
-    wrapper.style.width = ${210 / scale}mm;
-
-    if (blackAndWhite) document.body.classList.add('grayscale-print');
-
-    const opt = {
-        margin: 5,
-        filename: job-order-${invoice}.pdf,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, allowTaint: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    // Create job object
+    const invoice = generateInvoice();
+    const job = {
+      invoice,
+      orderDate,
+      contactPerson,
+      telephone,
+      companyName: form.elements['companyName'].value || '',
+      quantity,
+      kindOfJob: form.elements['kindOfJob'].value || '',
+      productType: productTypeVal,
+      modelVariant,
+      dimensions: form.elements['dimensions'].value || '',
+      printingType: form.elements['printingType'].value || '',
+      lamination: form.elements['lamination'].value || '',
+      foiling: form.elements['foiling'].value || '',
+      dieCutting: form.elements['dieCutting'].value || '',
+      embossingUV: form.elements['embossingUV'].value || '',
+      foamType: form.elements['foamType'].value || '',
+      paperType: form.elements['paperType'].value || '',
+      remarks: form.elements['remarks'].value || '',
+      managerProduction: form.elements['managerProduction'].value || '',
+      accountant: form.elements['accountant'].value || '',
+      deliveryDate: form.elements['deliveryDate'].value || '',
+      attachments: [] // we'll store small metadata + dataUrls for images for preview on load
     };
 
+    // read attachments (if any) as dataUrls for preview later and store name/type
+    const files = Array.from(attachmentsInput.files || []).slice(0,5);
+    const filePromises = files.map(file => new Promise((res) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const isImage = file.type.startsWith('image/');
+        res({
+          name: file.name,
+          type: isImage ? 'image' : 'file',
+          dataUrl: ev.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }));
+
+    Promise.all(filePromises).then(results => {
+      job.attachments = results;
+      // persist into localStorage
+      const jobs = getJobs();
+      jobs.push(job);
+      saveJobs(jobs);
+      renderJobs();
+      showToast('Job added successfully!', 'success');
+
+      // reset form (but keep next invoice preview updated)
+      form.reset();
+      attachmentPreview.innerHTML = '';
+      remarks.value = '';
+      charCount.textContent = '0/500';
+      refreshInvoicePreview();
+    }).catch(err => {
+      console.error(err);
+      showToast('Error adding attachments', 'error');
+    });
+  });
+
+  // Save draft manually
+  saveDraftBtn.addEventListener('click', () => {
+    const data = collectFormDataForDraft();
+    localStorage.setItem('draft', JSON.stringify(data));
+    showToast('Draft saved', 'success');
+  });
+
+  // Auto-save draft every 20s
+  setInterval(() => {
     try {
-        await html2pdf().set(opt).from(wrapper).save();
-        showToast(Exported ${invoice}, 'success');
+      const data = collectFormDataForDraft();
+      localStorage.setItem('draft', JSON.stringify(data));
     } catch (err) {
-        console.error('Export failed', err);
-        showToast('Export failed', 'error');
-    } finally {
-        if (blackAndWhite) document.body.classList.remove('grayscale-print');
-        document.body.removeChild(wrapper);
+      // ignore
     }
-}
+  }, 20000);
 
-/* wait for images in node to load */
-function waitForImagesToLoad(container) {
-    const imgs = Array.from(container.querySelectorAll('img'));
-    return Promise.all(imgs.map(img => new Promise(res => {
-        if (img.complete) return res();
-        img.onload = img.onerror = () => res();
-    })));
-}
+  // Load draft on start
+  (function loadDraft() {
+    const draft = JSON.parse(localStorage.getItem('draft') || 'null');
+    if (!draft) return;
+    // set product type first so model container correct
+    if (draft.productType) {
+      form.elements['productType'].value = draft.productType;
+      setModelInputForProduct(draft.productType);
+    }
+    // populate fields
+    Object.keys(draft).forEach(k => {
+      if (k === 'modelVariant') {
+        const ms = document.getElementById('modelVariantSelect');
+        const mi = document.getElementById('modelVariantInput');
+        if (ms) ms.value = draft[k];
+        if (mi) mi.value = draft[k];
+      } else {
+        if (form.elements[k]) form.elements[k].value = draft[k];
+      }
+    });
 
-/* Print/preview current form (not saved job) */
-function previewPrint(blackAndWhite=false) {
-    // validate minimally
-    if (!validateFormForAdd()) { alert('Please fill required fields before preview/print.'); return; }
-    // collect job object without assigning invoice
-    const job = collectJobObject(false);
-    // build printable element and export
-    const printable = buildPrintable(job);
-    exportJobPdf(printable, job.invoice || 'draft', blackAndWhite);
-}
-
-/* Print single job directly by index */
-function printJobByIndex(idx, blackAndWhite=false) {
-    const jobs = readJobs();
-    const job = jobs[idx];
-    if (!job) return;
-    const printable = buildPrintable(job);
-    exportJobPdf(printable, job.invoice || 'no-invoice', blackAndWhite);
-}
-
-/* Open job modal, wired earlier via refreshJobsList -> view-job click */
-function openJobModal(idx) { openJobModalImpl(idx); }
-function openJobModalImpl(idx) {
-    const jobs = readJobs();
-    const job = jobs[idx];
-    if (!job) return;
-    modalTitle.textContent = Preview ${job.invoice || ''};
-    modalContent.innerHTML = '';
-    const printable = buildPrintable(job);
-    modalContent.appendChild(printable);
-    modal.classList.remove('hidden');
-    // wire modal print buttons
-    modalPrintColor.onclick = () => exportJobPdf(printable, job.invoice || 'no-invoice', false);
-    modalPrintBW.onclick = () => exportJobPdf(printable, job.invoice || 'no-invoice', true);
-}
-
-/* JSON import handler */
-function handleJSONImport(e) {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    const fr = new FileReader();
-    fr.onload = (ev) => {
-        try {
-            const data = JSON.parse(ev.target.result);
-            // If it's array -> import as jobs list
-            if (Array.isArray(data)) {
-                if (!confirm('Importing array will append these jobs to existing jobs. Continue?')) return;
-                const jobs = readJobs();
-                data.forEach(j => jobs.unshift(j));
-                writeJobs(jobs);
-                showToast('Imported jobs', 'success');
-            } else {
-                // treat as single job -> populate form for editing/confirm
-                populateFormFromData(data);
-                showToast('Imported into form', 'success');
-            }
-        } catch (err) {
-            console.error(err);
-            alert('Failed to import JSON');
+    // attachments preview from draft (if images)
+    if (draft.attachments && draft.attachments.length) {
+      attachmentPreview.innerHTML = '';
+      draft.attachments.slice(0,5).forEach(att => {
+        if (att.type === 'image' && att.dataUrl) {
+          const img = document.createElement('img');
+          img.src = att.dataUrl;
+          img.className = 'w-full h-24 object-cover rounded border';
+          attachmentPreview.appendChild(img);
+        } else {
+          const d = document.createElement('div');
+          d.className = 'text-xs text-gray-700 p-2 border rounded';
+          d.textContent = att.name || 'file';
+          attachmentPreview.appendChild(d);
         }
-    };
-    fr.readAsText(file);
-    e.target.value = '';
-}
-
-/* Populate form from JSON object */
-function populateFormFromData(d) {
-    orderDate.value = d.orderDate || '';
-    contactPerson.value = d.contactPerson || '';
-    telMob.value = d.telMob || '';
-    companyName.value = d.companyName || '';
-    quantity.value = d.quantity || '';
-    kindOfJob.value = d.kindOfJob || '';
-    productType.value = d.productType || '';
-    onProductTypeChange();
-    setTimeout(() => modelSelect.value = d.model || '', 100);
-    dimensions.value = d.dimensions || '';
-    printingType.value = d.printingType || '';
-    lamination.value = d.lamination || '';
-    foilingType.value = d.foilingType || '';
-    dieCutting.value = d.dieCutting || '';
-    embossingUV.value = d.embossingUV || '';
-    foamType.value = d.foamType || '';
-    paperType.value = d.paperType || '';
-    specialPaper.value = d.specialPaper || '';
-    remarks.value = d.remarks || '';
-    charCount.textContent = remarks.value.length;
-    manager.value = d.manager || '';
-    accountant.value = d.accountant || '';
-    deliveryDate.value = d.deliveryDate || '';
-    // attachments from object if present -> load into attachments
-    if (d.attachments) {
-        attachments = { images: d.attachments.images || [], pdf: d.attachments.pdf || null };
-        renderAttachments();
+      });
     }
-}
+  })();
 
-/* Download single job JSON or array helpers used earlier */
-function downloadJson(obj, filename) {
-    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
-}
+  // collect form data for draft (including attachments preview dataUrls if present)
+  function collectFormDataForDraft() {
+    const data = {};
+    Array.from(form.elements).forEach(el => {
+      if (!el.name) return;
+      if (el.type === 'file') return; // we'll collect attachments separately
+      data[el.name] = el.value;
+    });
+    // attachments: capture preview images from attachmentPreview (if any)
+    const previewImgs = Array.from(attachmentPreview.querySelectorAll('img'));
+    data.attachments = previewImgs.map(img => ({ type: 'image', dataUrl: img.src }));
+    return data;
+  }
 
-/* Utility toast */
-function showToast(msg, type='info') {
-    const box = document.createElement('div');
-    box.textContent = msg;
-    box.style.position = 'fixed';
-    box.style.left = '50%';
-    box.style.top = '20px';
-    box.style.transform = 'translateX(-50%)';
-    box.style.zIndex = 9999;
-    box.style.padding = '8px 12px';
-    box.style.borderRadius = '6px';
-    box.style.color = '#fff';
-    box.style.background = (type==='success')? '#059669' : (type==='error' ? '#dc2626' : '#2563eb');
-    document.body.appendChild(box);
-    setTimeout(()=> box.style.opacity = '0', 2200);
-    setTimeout(()=> box.remove(), 2600);
-}
+  // Clear form
+  clearFormBtn.addEventListener('click', () => {
+    if (!confirm('Clear all fields?')) return;
+    form.reset();
+    attachmentPreview.innerHTML = '';
+    remarks.value = '';
+    charCount.textContent = '0/500';
+    setModelInputForProduct('');
+    refreshInvoicePreview();
+    showToast('Form cleared', 'info');
+  });
 
-/* Utility: show saved banner */
-function showSavedIndicator() {
-    savedIndicator.classList.add('show');
-    setTimeout(()=> savedIndicator.classList.remove('show'), 1600);
-}
+  // Print color
+  printColorBtn.addEventListener('click', () => {
+    document.body.classList.remove('pdf-export');
+    window.print();
+  });
 
-/* Read jobs and refresh on load */
-refreshJobsList();
+  // Print B&W
+  printBWBtn.addEventListener('click', () => {
+    document.body.style.filter = 'grayscale(1)';
+    window.print();
+    setTimeout(()=> { document.body.style.filter = 'none'; }, 500);
+  });
 
-/* Testing helpers (developer): seed sample job if needed */
-// function seedSample() { const j = collectJobObject(true); const jobs = readJobs(); jobs.unshift(j); writeJobs(jobs); }
+  // Export All JSON
+  exportAllJSONBtn.addEventListener('click', () => {
+    const jobs = getJobs();
+    if (!jobs.length) {
+      showToast('No jobs to export', 'error');
+      return;
+    }
+    const blob = new Blob([JSON.stringify(jobs, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'jobs.json';
+    a.click();
+  });
 
-/* Utility: print current form as PDF quickly (uses previewPrint wrapper) */
-function printColor() { previewPrint(false); }
-function printBW() { previewPrint(true); }
+  // Clear all jobs
+  clearAllJobsBtn.addEventListener('click', () => {
+    if (!confirm('Delete all jobs?')) return;
+    localStorage.removeItem('jobs');
+    renderJobs();
+    showToast('All jobs deleted', 'success');
+  });
 
-/* Helper to clear invoice assignment logic note:
-   Important: We DO NOT auto-increment invoice on page load. getNextInvoice only increments when called during Confirm & Add Job.
-*/
+  // initial render jobs
+  renderJobs();
 
-/* End of script */
+  // keyboard shortcuts: Ctrl+S save draft, Ctrl+P print
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      saveDraftBtn.click();
+    }
+    if (e.ctrlKey && e.key.toLowerCase() === 'p') {
+      e.preventDefault();
+      printColorBtn.click();
+    }
+  });
+
+}); // DOMContentLoaded
 </script>
 </body>
 </html>
